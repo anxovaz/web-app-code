@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>k8s-web</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      header {
+        background-color: #f4f4f4;
+        padding: 10px 20px;
+        text-align: left;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ccc;
+      }
+
+      header button {
+        margin-right: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      #primerp {
+        text-align: center;
+      }
+
+      form {
+        text-align: center;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: inline-block;
+        width: 150px;
+        text-align: right;
+        margin-right: 10px;
+      }
+
+      input[type="text"], select {
+        width: 200px;
+      }
+
+      #customImageInput {
+        display: none;
+        margin-left: 10px;
+      }
+    </style>
+    <script>
+      function toggleCustomImage(select) {
+        const customInput = document.getElementById("customImageInput");
+        if (select.value === "otro") {
+          customInput.style.display = "inline-block";
+          customInput.required = true;
+        } else {
+          customInput.style.display = "none";
+          customInput.required = false;
+        }
+      }
+
+      function ir(page) {
+        window.location.href = page;
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <button onclick="ir('index.html')">Desplegar</button>
+      <button onclick="ir('servicios.php')">Ver Servicios</button>
+      <button onclick="ir('estado.php')">Ver estado de los Pods</button>
+    </header>
+
+    <h1>Desplegar</h1>
+    <p id="primerp">Escoja un tipo de servicio a desplegar y un nombre</p>
+
+    <form method="post" action="deploy.php">
+      <div class="form-group">
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="image">Container Image:</label>
+        <select id="image" name="image" onchange="toggleCustomImage(this)" required>
+          <option value="nginx:latest">nginx</option>
+          <option value="mysql:latest">mysql</option>
+          <option value="delfer/alpine-ftp-server:latest">ftp</option>
+          <option value="otro">otro</option>
+        </select>
+        <input type="text" id="customImageInput" name="customImage" placeholder="Ingrese imagen personalizada">
+      </div>
+
+      <input type="submit" value="Desplegar">
+    </form>
+  </body>
+</html>

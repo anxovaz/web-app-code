@@ -1,0 +1,23 @@
+<?php
+// Establecer la variable de entorno KUBECONFIG
+putenv("KUBECONFIG=/var/www/.kube/config");
+
+// Obtener el nombre del deployment
+$deploymentName = escapeshellarg($_POST['name']);
+
+// Determinar la imagen a usar
+if ($_POST['image'] === 'otro' && !empty($_POST['customImage'])) {
+    $image = escapeshellarg($_POST['customImage']);
+} else {
+    $image = escapeshellarg($_POST['image']);
+}
+
+// Comando para crear el deployment con 5 réplicas
+$command = "kubectl create deployment $deploymentName --image=$image --replicas=5";
+$output = shell_exec($command);
+$commandPatch = "kubectl patch deployment $deploymentName -p '{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"$deploymentName\",\"imagePullPolicy\":\"IfNotPresent\"}]}}}}'";
+exec($commandPatch);
+
+// Mostrar salida
+echo "<pre>$output</pre>";
+?>
