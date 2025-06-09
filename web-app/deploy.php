@@ -1,12 +1,12 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST") { //si el método es POST
     $nameInput = $_POST["name"] ?? "";
     $selectedImage = $_POST["image"] ?? "";
     $customImage = $_POST["customImage"] ?? "";
 
     // Limpiar y validar nombre
     $name = escapeshellarg($nameInput);
-    $name = trim($name, "'");
+    $name = trim($name, "'"); 
 
     // Obtener imagen
     if ($selectedImage === "otro") {
@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $tipo = "custom";
     } else {
         $image = trim($selectedImage);
-        $tipo = $image; // ya incluye 'wordpress:latest', 'mysql:latest', etc.
+        $tipo = $image; // ya incluye 'wordpress:latest', 'mysql:latest', ...
     }
 
     if (empty($name) || empty($image)) {
@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    if ($tipo === "nginx:latest") {
+    if ($tipo === "nginx:latest") { //Si la imagen es nginx
 $yaml = <<<YAML
 apiVersion: apps/v1
 kind: Deployment
@@ -59,7 +59,7 @@ spec:
 
 YAML;
 
-    } elseif ($tipo === "mysql:latest") {
+    } elseif ($tipo === "mysql:latest") { //si la imágen es mysql
         $yaml = <<<YAML
 apiVersion: apps/v1
 kind: Deployment
@@ -97,7 +97,7 @@ spec:
     port: 3306           # Puerto accesible desde dentro del cluster
     targetPort: 3306       # Puerto en el contenedor
 YAML;
-}elseif($tipo === "delfer/alpine-ftp-server:latest"){
+}elseif($tipo === "delfer/alpine-ftp-server:latest"){ //si es ftp
     $yaml = <<<YAML
 apiVersion: apps/v1
 kind: Deployment
@@ -154,7 +154,7 @@ spec:
 YAML;
 
 
-  }else {
+  }else { //si es otra
         $yaml = <<<YAML
 apiVersion: apps/v1
 kind: Deployment
@@ -181,26 +181,30 @@ YAML;
         2 => ["pipe", "w"]
     ];
 
+    // Ejecutar el comando 'kubectl apply -f -' que aplica la configuración YAML desde la entrada estándar
     $process = proc_open('kubectl apply -f -', $descriptorspec, $pipes);
 
-    if (is_resource($process)) {
+    if (is_resource($process)) { // Si el proceso se inicia correctamente
+        // Enviar el el YAML generado al proceso
         fwrite($pipes[0], $yaml);
         fclose($pipes[0]);
-
+                                
+        // Leer la salida del proceso 
         $output = stream_get_contents($pipes[1]);
         fclose($pipes[1]);
 
+        // Cerrar el proceso y obtener su código de salida
         $errors = stream_get_contents($pipes[2]);
         fclose($pipes[2]);
 
         $exitCode = proc_close($process);
 
-        if ($exitCode === 0) {
+        if ($exitCode === 0) { //si es correcto
             echo "<p>Servicio levantado correctamente:</p><pre>$output</pre>";
-        } else {
+        } else { //si no lo es
             echo "<p>Error al desplegar:</p><pre>$errors</pre>";
         }
-    } else {
+    } else { //si no se inicia correctamente
         echo "Error al ejecutar el comando.";
     }
 }
