@@ -54,12 +54,12 @@
   <h1>Estado de los Pods en Kubernetes</h1>
 
   <?php
-    $podsOutput = shell_exec('kubectl get pods -o wide 2>&1');
+    $podsOutput = shell_exec('kubectl get pods -o wide 2>&1'); //obtener pods
 
-    if ($podsOutput === null || str_contains($podsOutput, 'Error')) {
+    if ($podsOutput === null || str_contains($podsOutput, 'Error')) { //Si es null o erroneo
       echo '<p class="error">Error al ejecutar <code>kubectl get pods</code>.</p>';
-    } else {
-      echo '<pre>' . htmlspecialchars($podsOutput) . '</pre>';
+    } else { //si es correcto
+      echo '<pre>' . htmlspecialchars($podsOutput) . '</pre>'; //mostrar salida con formato
     }
   ?>
 </body>
